@@ -54,3 +54,26 @@ END $$;
 --1.2 Faça um programa que calcule o determinante de uma matriz quadrada de ordem 3
 -- a regra de Sarrus. Veja a regra aqui:
 --https://en.wikipedia.org/wiki/Rule_of_Sarrus
+
+CREATE OR REPLACE FUNCTION calcular_determinante(matriz double precision[][])
+RETURNS double precision AS
+$$
+DECLARE
+    det double precision;
+BEGIN
+    IF array_length(matriz, 1) IS DISTINCT FROM 3 OR array_length(matriz, 2) IS DISTINCT FROM 3 THEN
+        RAISE EXCEPTION 'A matriz não é 3x3';
+    END IF;
+
+    det := (matriz[1][1] * matriz[2][2] * matriz[3][3] +
+            matriz[1][2] * matriz[2][3] * matriz[3][1] +
+            matriz[1][3] * matriz[2][1] * matriz[3][2]) -
+           (matriz[1][3] * matriz[2][2] * matriz[3][1] +
+            matriz[1][2] * matriz[2][1] * matriz[3][3] +
+            matriz[1][1] * matriz[2][3] * matriz[3][2]);
+
+    RETURN det;
+END;
+$$
+LANGUAGE plpgsql;
+SELECT calcular_determinante(array[[3.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]) AS determinante;
